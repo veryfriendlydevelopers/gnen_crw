@@ -26,17 +26,40 @@ with open('password.txt', 'r', encoding='utf-8') as file:
     login_pw = file.read().strip()
 
 
-# Chrome 옵션 설정
 chrome_options = Options()
-chrome_options.add_argument("--disable-blink-features=AutomationControlled")  # 자동화 탐지 방지
-chrome_options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
-chrome_options.add_experimental_option("detach", True)
 
-# WebDriver 초기화
+# 헤드리스 모드 비활성화 (필요하면 headless도 True로 설정 가능)
+chrome_options.headless = False
+
+# 옵션들 추가
+chrome_options.add_argument('--disable-blink-features=AutomationControlled')  # 자동화 탐지 방지
+chrome_options.add_argument("--disable-blink-features=AutomationControlled")
+chrome_options.add_argument('--disable-gpu')  # GPU 비활성화
+chrome_options.add_argument('--no-sandbox')   # Sandbox 비활성화(안정성 증가)
+chrome_options.add_argument('--disable-dev-shm-usage') # 리소스 문제 방지
+chrome_options.add_argument('--disable-infobars') # 크롬 자동화 메시지 숨김
+chrome_options.add_argument('--start-maximized') # 최대 화면 모드
+chrome_options.page_load_strategy = 'eager'  # 페이지 로딩시간 단축 (필요 시 사용)
+
+# 사용자 프로필을 사용하는 방법(더욱 실제 브라우저처럼 작동)
+# chrome_options.add_argument('--user-data-dir=C:\\Users\\사용자명\\AppData\\Local\\Google\\Chrome\\User Data')
+
+# 현재 설정 중 유지할 내용들
+chrome_options.add_argument(
+    "user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+    "AppleWebKit/537.36 (KHTML, like Gecko) "
+    "Chrome/120.0.0.0 Safari/537.36"
+)
+
+chrome_options.add_experimental_option("detach", True)  # 브라우저 종료 방지
+
 driver = webdriver.Chrome(options=chrome_options)
-driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")  # WebDriver 탐지 우회
-driver.implicitly_wait(3)
-driver.set_window_size(1920, 1080)
+
+# 추가 권장사항
+driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")  # webdriver 숨기기
+
+# 더 안정적인 암시적 대기 (권장)
+driver.implicitly_wait(10)
 
 # 크롤링할 페이지 URL 목록
 pageList = [
@@ -77,18 +100,24 @@ login_button = WebDriverWait(driver, 10).until(
 )
 login_button.click()
 
+time.sleep(5)
 
-# for page in pageList:
-#     driver.get(page)
-#     driver.implicitly_wait(4)
-#     time.sleep(3)
+
+
+
+for page in pageList:
+    driver.get(page)
+    WebDriverWait(driver, 20).until(
+        EC.presence_of_element_located((By.CSS_SELECTOR, "h3.UserProfile__StyledName-sc-36315857-4"))
+    )
+    time.sleep(3)
     
-#     # 이름을 가져오기
-#     namesList = driver.find_elements(By.CLASS_NAME, "UserProfile__StyledName-sc-36315857-4 AYCqw")
-#     for a in namesList:
-#         r_name = a.get_attribute("text")
-#         if r_name:
-#             gn_names.append(r_name)
+    # 이름을 가져오기
+    namesList = driver.find_elements(By.CSS_SELECTOR, "h3.UserProfile__StyledName-sc-36315857-4")
+    for a in namesList:
+        r_name = a.get_attribute("text")
+        if r_name:
+            gn_names.append(r_name)
             
     
     # # 페이지의 끝까지 스크롤하여 컨텐츠 로드
