@@ -8,11 +8,11 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import undetected_chromedriver as uc
 
-# 아이디, 비밀번호 가져오기
-with open('id.txt', 'r', encoding='utf-8') as f:
-    login_id = f.read().strip()
-with open('password.txt', 'r', encoding='utf-8') as file:
-    login_pw = file.read().strip()
+# # 아이디, 비밀번호 가져오기
+# with open('id.txt', 'r', encoding='utf-8') as f:
+#     login_id = f.read().strip()
+# with open('password.txt', 'r', encoding='utf-8') as file:
+#     login_pw = file.read().strip()
 
 # 크롬 옵션 설정
 chrome_options = Options()
@@ -35,154 +35,57 @@ driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () =>
 
 # 크롤링할 페이지 URL 목록
 pageList = [
-    "https://www.gangnamunni.com/reviews?hospitalId=322",
     "https://www.gangnamunni.com/reviews?hospitalId=826"
 ]
 
-gn_names = []
 
-# 로그인 페이지 접속
+
+# 로그인 프로세스스
+
+# # 로그인 페이지 접속
+# driver.get("https://accounts.kakao.com/login/?continue=https%3A%2F%2Fkauth.kakao.com%2Foauth%2Fauthorize%3Fclient_id%3D36cf3898c3072e555ea6a49b299f8a06%26redirect_uri%3Dhttps%253A%252F%252Fwww.gangnamunni.com%252Fsignup%252Foauth%252Fkakao%26response_type%3Dcode%26scope%3Daccount_email%252Cbirthday%252Cname%252Cphone_number%252Ctalk_message%26through_account%3Dtrue#login")
+# WebDriverWait(driver, 10).until(
+#     EC.element_to_be_clickable((By.ID, 'loginId--1'))
+# ).send_keys(login_id)
+
+# time.sleep(random.uniform(0.5, 1))
+
+# WebDriverWait(driver, 10).until(
+#     EC.element_to_be_clickable((By.ID, 'password--2'))
+# ).send_keys(login_pw)
+
+# # 로그인 버튼 클릭
+# WebDriverWait(driver, 10).until(
+#     EC.element_to_be_clickable((By.CSS_SELECTOR, 'button.btn_g.highlight.submit'))
+# ).click()
+
+# time.sleep(3)
+
+# 브라우저 실행
+driver = webdriver.Chrome()
+
+# 로그인 페이지로 이동
 driver.get("https://accounts.kakao.com/login/?continue=https%3A%2F%2Fkauth.kakao.com%2Foauth%2Fauthorize%3Fclient_id%3D36cf3898c3072e555ea6a49b299f8a06%26redirect_uri%3Dhttps%253A%252F%252Fwww.gangnamunni.com%252Fsignup%252Foauth%252Fkakao%26response_type%3Dcode%26scope%3Daccount_email%252Cbirthday%252Cname%252Cphone_number%252Ctalk_message%26through_account%3Dtrue#login")
-WebDriverWait(driver, 10).until(
-    EC.element_to_be_clickable((By.ID, 'loginId--1'))
-).send_keys(login_id)
 
-time.sleep(random.uniform(0.5, 1))
+# 수동 로그인을 위해 기다림 (예: 로그인 후 보이는 특정 요소 기다림)
+element = WebDriverWait(driver, 300).until(
+    EC.presence_of_element_located((By.CLASS_NAME, 'GlobalHeader__StyledUserImage-sc-35f0e887-9'))
+)
 
-WebDriverWait(driver, 10).until(
-    EC.element_to_be_clickable((By.ID, 'password--2'))
-).send_keys(login_pw)
-
-# 로그인 버튼 클릭
-WebDriverWait(driver, 10).until(
-    EC.element_to_be_clickable((By.CSS_SELECTOR, 'button.btn_g.highlight.submit'))
-).click()
-
-time.sleep(3)
+print("로그인 완료됨! 다음 단계로 진행합니다.")
 
 
 
 
+# 변수들 담아올 리스트
 
-# # 페이지 별 이름 수집
-# for page in pageList:
-#     try:
-#         driver.get(page)
-        
-#         WebDriverWait(driver, 20).until(
-#             EC.presence_of_all_elements_located((By.CSS_SELECTOR, "h3.UserProfile__StyledName-sc-36315857-4"))
-#         )
-        
-#         time.sleep(random.uniform(2, 4))
-        
-        
-        
-#         # 이름 추출 (span 제외)
-#         namesList = driver.find_elements(By.CSS_SELECTOR, "h3.UserProfile__StyledName-sc-36315857-4")
-#         for name_el in namesList:
-#             full_text = name_el.text.strip()
-#             r_name = full_text.split('Lv.')[0].strip()
-#             if r_name:
-#                 gn_names.append(r_name)
-                
-#         # 서버 부하 방지를 위한 대기
-#         time.sleep(random.uniform(1.5, 3.5))
-        
-#     except Exception as e:
-#         print(f"오류 발생: {e}")
-#         time.sleep(5)
-
-# # 최종 결과 출력 (확인용)
-# print(gn_names)
+gn_hname = [] # 병원이름
+gn_names = [] # 작성자
+gn_dates = [] # 작성날짜
+gn_tags = [] # 태그
+gn_reviews= [] # 리뷰본문
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# gn_names = []
-
-# for page in pageList:
-#     try:
-#         driver.get(page)
-
-#         # 페이지 로딩 기다림
-#         WebDriverWait(driver, 20).until(
-#             EC.presence_of_element_located((By.CSS_SELECTOR, "h3.UserProfile__StyledName-sc-36315857-4"))
-#         )
-
-#         # 초기에 페이지를 최대한 아래로 스크롤 (최대 10번 반복)
-#         last_height = driver.execute_script("return document.body.scrollHeight")
-#         for _ in range(10):
-#             driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-#             time.sleep(random.uniform(1.5, 2.5))
-#             new_height = driver.execute_script("return document.body.scrollHeight")
-#             if new_height == last_height:
-#                 break
-#             last_height = new_height
-
-#         # "더보기" 버튼 클릭 (있으면 클릭)
-#         try:
-#             more_button = WebDriverWait(driver, 5).until(
-#                 EC.element_to_be_clickable(
-#                     (By.CSS_SELECTOR, "button.bg-gray-200.rounded-\[8px\].px-4.py-2.w-full"))
-#             )
-#             driver.execute_script("arguments[0].click();", more_button)
-#             time.sleep(random.uniform(2, 3))
-#         except Exception as e:
-#             print("더보기 버튼이 없습니다:", e)
-
-#         # 더보기 버튼 클릭 후 다시 최대한 아래로 스크롤
-#         last_height = driver.execute_script("return document.body.scrollHeight")
-#         for _ in range(15):  # 더 많은 로딩을 위해 반복 횟수 증가 가능
-#             driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-#             time.sleep(random.uniform(1.5, 2.5))
-#             new_height = driver.execute_script("return document.body.scrollHeight")
-#             if new_height == last_height:
-#                 break
-#             last_height = new_height
-
-#         # 모든 데이터 로딩 후 이름 수집
-#         namesList = driver.find_elements(By.CSS_SELECTOR, "h3.UserProfile__StyledName-sc-36315857-4")
-#         for name_el in namesList:
-#             full_text = name_el.text.strip()
-#             r_name = full_text.split('Lv.')[0].strip()
-#             if r_name:
-#                 gn_names.append(r_name)
-
-#         # 페이지간 휴식
-#         time.sleep(random.uniform(2, 4))
-
-#     except Exception as e:
-#         print(f"오류 발생: {e}")
-#         time.sleep(5)
-
-# # 최종 결과 출력
-# print(gn_names, len(gn_names))
-
-
-
-
-
-
-
-
-gn_names = []
 
 for page in pageList:
     try:
@@ -218,7 +121,19 @@ for page in pageList:
                 break
             last_height = new_height
 
-        # 모든 데이터 로딩 후 이름 수집
+        # 여기서 부터 데이터 수집
+        
+        
+        
+        #작성자자 수집
+        namesList = driver.find_elements(By.CSS_SELECTOR, "h3.UserProfile__StyledName-sc-36315857-4")
+        for name_el in namesList:
+            full_text = name_el.text.strip()
+            r_name = full_text.split('Lv.')[0].strip()
+            if r_name:
+                gn_names.append(r_name)
+                
+        #작성자자 수집
         namesList = driver.find_elements(By.CSS_SELECTOR, "h3.UserProfile__StyledName-sc-36315857-4")
         for name_el in namesList:
             full_text = name_el.text.strip()
@@ -235,6 +150,12 @@ for page in pageList:
     except Exception as e:
         print(f"오류 발생: {e}")
         time.sleep(5)
+        
+        
+    #병원 이름(리뷰 수 만큼 병원 이름을 리스트에 반복해서 넣음음)
+        hname = driver.find_element(By.CSS_SELECTOR, "h1.sc-kyMESl bxvimI")
+        for i in range(len(namesList)):
+            gn_hname.append(hname)
 
 # 최종 결과 출력
 print(f"총 수집된 리뷰 개수: {len(gn_names)}")
